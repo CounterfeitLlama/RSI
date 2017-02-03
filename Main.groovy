@@ -17,9 +17,6 @@ import net.java.games.input.Event;
 String name = "imageProvider"
 AbstractImageProvider camera0 = null;
 
-ServoChannel pan = new ServoChannel(dyio.getChannel(9))
-ServoChannel tilt = new ServoChannel(dyio.getChannel(8))
-
 if (DeviceManager.getSpecificDevice(AbstractImageProvider.class, name) == null) {
 	camera0 = new OpenCVImageProvider(0);
 	DeviceManager.addConnection(camera0,name);
@@ -57,11 +54,6 @@ while (!Thread.interrupted() && i < 200) {
 		" x location = " + data.get(0).getX() +
 		" y location " + data.get(0).getY() +
 		" size = " + data.get(0).getSize())
-
-		if (data.get(0).getX() < inputImage.getWidth() / 2) {pan.SetPosition(pan.getValue() + 1)}
-		if (data.get(0).getX() > inputImage.getWidth() / 2) {pan.SetPosition(pan.getValue() - 1);}
-		if (data.get(0).getY() < inputImage.getHeight() / 2) {tilt.SetPosition(tilt.getValue() + 1);}
-		if (data.get(0).getY() > inputImage.getHeight() / 2) {tilt.SetPosition(tilt.getValue() - 1);}
 	}
 	i++;
 }
