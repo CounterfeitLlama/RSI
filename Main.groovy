@@ -56,4 +56,16 @@ while (!Thread.interrupted() && i < 200) {
 		" size = " + data.get(0).getSize())
 	}
 	i++;
+
+	percentUp = data.get(0).getY() / inputImage.getHeight()
+	eyeLocY = percentUp * (188-63) + 63
+	println(eyeLocY)
 }
+
+//Servo up and down limits:
+/*Lower limit (pointing up): 63*/
+/*Upper limit (pointing down): 188*/
+
+//Servo side limits:
+/*Lower limit (pointing right): 74*/
+/*Upper limit (pointing left): 116*/
