@@ -50,17 +50,24 @@ if (!dirFile.exists()) {
 	 dirFile.mkdir();
 }
 
-// Loop checking the camera for faces
-int i = 0;
 while (!Thread.interrupted()) {
 	while (!Thread.interrupted() && run == true) {
-		camera0.getLatestImage(inputImage, displayImage)               // capture image
-		List<Detection> data = detector.getObjects(inputImage, displayImage)
+		camera0.getLatestImage(inputImage, displayImage) //Capture image from camera
+		List<Detection> data = detector.getObjects(inputImage, displayImage) //Find faces in the image
 		if (data.size() > 0) {
-			println("Got: " + data.size() + 
-			" x location = " + data.get(0).getX() +
-			" y location " + data.get(0).getY() +
-			" size = " + data.get(0).getSize())
+			//println("Got: " + data.size() + 
+			//" x location = " + data.get(0).getX() +
+			//" y location " + data.get(0).getY() +
+			//" size = " + data.get(0).getSize())
+
+			/**
+			 * Determine proper position of servo
+			 * 
+			 * percentage = person.height - max.height
+			 * servoPosition = percentage * (servoRange) + minServoValue
+			 * 
+			 * This math works the same for both x and y coordinates
+			 */
 			percentUp = data.get(0).getY() / inputImage.getHeight()
 			eyeLocY = percentUp * (188-63) + 63
 			eyeY.SetPosition((int)eyeLocY)
@@ -69,15 +76,19 @@ while (!Thread.interrupted()) {
 			eyeLocX = percentRight * (116-74) + 74
 			eyeX.SetPosition((int)eyeLocX)
 		}
-	
+
+		//Press button to stop the facial tracking
 		if (button.getValue() == 0) {
 			run = false
+			println("Stopped")
 			sleep(1000)
 		}
 	}
 
+	//Press button to start the facial tracking
 	if (button.getValue() == 0) {
 		run = true
+		println("Started")
 		sleep(1000)
 	}
 }
