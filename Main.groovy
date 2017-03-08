@@ -17,6 +17,17 @@ import net.java.games.input.Event;
 String name = "imageProvider"
 AbstractImageProvider camera0 = null;
 
+ServoChannel eyeY = new ServoChannel(dyio.getChannel(10))
+ServoChannel eyeX = new ServoChannel(dyio.getChannel(3))
+
+DyIOChannel button = dyio.getChannel(14)
+
+while (true) {
+	if (button.getValue() == 0) {
+		println("0")
+	}
+}
+
 if (DeviceManager.getSpecificDevice(AbstractImageProvider.class, name) == null) {
 	camera0 = new OpenCVImageProvider(0);
 	DeviceManager.addConnection(camera0,name);
@@ -46,7 +57,7 @@ if (!dirFile.exists()) {
 
 // Loop checking the camera for faces
 int i = 0;
-while (!Thread.interrupted() && i < 200) {
+while (!Thread.interrupted() && i < 1000) {
 	camera0.getLatestImage(inputImage, displayImage)               // capture image
 	List<Detection> data = detector.getObjects(inputImage, displayImage)
 	if (data.size() > 0) {
@@ -54,12 +65,15 @@ while (!Thread.interrupted() && i < 200) {
 		" x location = " + data.get(0).getX() +
 		" y location " + data.get(0).getY() +
 		" size = " + data.get(0).getSize())
+		percentUp = data.get(0).getY() / inputImage.getHeight()
+		eyeLocY = percentUp * (188-63) + 63
+		eyeY.SetPosition((int)eyeLocY)
+
+		percentRight = (inputImage.getWidth() - data.get(0).getX()) / inputImage.getWidth()
+		eyeLocX = percentRight * (116-74) + 74
+		eyeX.SetPosition((int)eyeLocX)
 	}
 	i++;
-
-	percentUp = data.get(0).getY() / inputImage.getHeight()
-	eyeLocY = percentUp * (188-63) + 63
-	println(eyeLocY)
 }
 
 //Servo up and down limits:
