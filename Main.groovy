@@ -18,15 +18,10 @@ String name = "imageProvider"
 AbstractImageProvider camera0 = null;
 
 ServoChannel eyeY = new ServoChannel(dyio.getChannel(10))
-ServoChannel eyeX = new ServoChannel(dyio.getChannel(3))
+ServoChannel eyeX = new ServoChannel(dyio.getChannel(5))
 
 DyIOChannel button = dyio.getChannel(14)
-
-while (true) {
-	if (button.getValue() == 0) {
-		println("0")
-	}
-}
+boolean run = false
 
 if (DeviceManager.getSpecificDevice(AbstractImageProvider.class, name) == null) {
 	camera0 = new OpenCVImageProvider(0);
@@ -35,7 +30,7 @@ if (DeviceManager.getSpecificDevice(AbstractImageProvider.class, name) == null) 
 	camera0 = (AbstractImageProvider)DeviceManager.getSpecificDevice(AbstractImageProvider.class, name);
 }
 
-while (DeviceManager.getSpecificDevice(AbstractImageProvider.class, name) == null) {
+while (DeviceManager.getSpecificDevice(AbstractImageProvider.class,  name) == null) {
 	ThreadUtil.wait(100)
 }
 
@@ -57,23 +52,34 @@ if (!dirFile.exists()) {
 
 // Loop checking the camera for faces
 int i = 0;
-while (!Thread.interrupted() && i < 1000) {
-	camera0.getLatestImage(inputImage, displayImage)               // capture image
-	List<Detection> data = detector.getObjects(inputImage, displayImage)
-	if (data.size() > 0) {
-		println("Got: " + data.size() + 
-		" x location = " + data.get(0).getX() +
-		" y location " + data.get(0).getY() +
-		" size = " + data.get(0).getSize())
-		percentUp = data.get(0).getY() / inputImage.getHeight()
-		eyeLocY = percentUp * (188-63) + 63
-		eyeY.SetPosition((int)eyeLocY)
-
-		percentRight = (inputImage.getWidth() - data.get(0).getX()) / inputImage.getWidth()
-		eyeLocX = percentRight * (116-74) + 74
-		eyeX.SetPosition((int)eyeLocX)
+while (!Thread.interrupted()) {
+	while (!Thread.interrupted() && run == true) {
+		camera0.getLatestImage(inputImage, displayImage)               // capture image
+		List<Detection> data = detector.getObjects(inputImage, displayImage)
+		if (data.size() > 0) {
+			println("Got: " + data.size() + 
+			" x location = " + data.get(0).getX() +
+			" y location " + data.get(0).getY() +
+			" size = " + data.get(0).getSize())
+			percentUp = data.get(0).getY() / inputImage.getHeight()
+			eyeLocY = percentUp * (188-63) + 63
+			eyeY.SetPosition((int)eyeLocY)
+	
+			percentRight = (inputImage.getWidth() - data.get(0).getX()) / inputImage.getWidth()
+			eyeLocX = percentRight * (116-74) + 74
+			eyeX.SetPosition((int)eyeLocX)
+		}
+	
+		if (button.getValue() == 0) {
+			run = false
+			sleep(1000)
+		}
 	}
-	i++;
+
+	if (button.getValue() == 0) {
+		run = true
+		sleep(1000)
+	}
 }
 
 //Servo up and down limits:
